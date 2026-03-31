@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parade Bebek</title>
+    <style>
+        /* --- 1. CSS Reset & Layout --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #e3f2fd, #bbdefb); /* Langit Biru Muda */
+            font-family: 'Quicksand', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Container Utama */
+        .stage {
+            position: relative;
+            width: 320px; height: 450px;
+            display: flex; justify-content: center; align-items: flex-end;
+            perspective: 1200px;
+        }
+
+        /* --- 2. Kolam Bebek (Ganti Pot/Tanah) --- */
+        .pond-container {
+            position: absolute; bottom: 0;
+            width: 100%; height: 40%;
+            z-index: 10;
+        }
+
+        .pond {
+            width: 100%; height: 100%;
+            background-color: #03a9f4; /* Warna air biru tua */
+            border-radius: 50% 50% 10px 10px; /* Bentuk kolam bulat */
+            box-shadow: 0 10px 25px rgba(3, 169, 244, 0.4);
+            position: relative;
+            overflow: hidden;
+            border: 5px solid #81d4fa; /* Pinggiran kolam */
+        }
+
+        /* Bebek Karet Kecil yang Berenang */
+        .rubber-duck {
+            position: absolute;
+            width: 25px; height: 25px;
+            background: #ffeb3b;
+            border-radius: 50% 50% 10px 10px;
+            border: 2px solid #fbc02d;
+            animation: swim 4s infinite linear;
+            z-index: 2;
+        }
+        .rubber-duck::before { /* Paruh */
+            content: ''; position: absolute; left: -5px; top: 8px;
+            width: 8px; height: 6px; background: #ff9800; border-radius: 3px;
+        }
+        .rubber-duck.one { top: 20%; left: 20%; animation-delay: 0s; }
+        .rubber-duck.two { top: 40%; right: 15%; animation-delay: -2s; }
+
+        @keyframes swim {
+            0% { transform: translateX(0) rotate(0deg); }
+            50% { transform: translateX(50px) rotate(10deg); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+
+        /* Gelombang air */
+        .wave {
+            position: absolute; bottom: -10px; left: 0;
+            width: 200%; height: 40px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 40%;
+            animation: moveWave 6s infinite linear;
+        }
+        @keyframes moveWave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- 3. Makanan Bebek (Ganti Penyiram) --- */
+        .feed-hand {
+            position: absolute; top: -100px; right: 20px;
+            width: 60px; height: 80px;
+            background: #ffccbc; /* Warna kulit tangan */
+            border-radius: 10px;
+            opacity: 0; z-index: 20;
+            transform: rotate(30deg);
+            transition: all 1s ease-out;
+        }
+        .feed-food {
+            position: absolute; top: 40px; left: -10px;
+            width: 30px; height: 10px;
+            display: flex; justify-content: space-around;
+        }
+        .pellet {
+            width: 5px; height: 5px; background: #a1887f; border-radius: 50%;
+            animation: fallPellet 1.2s infinite ease-out;
+        }
+        .feed-hand.active { top: 50px; opacity: 1; }
+
+        @keyframes fallPellet {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            80% { transform: translateY(80px) scale(0.5); opacity: 0.5; }
+            100% { transform: translateY(100px) scale(0); opacity: 0; }
+        }
+
+        /* --- 4. Bebek Raksasa yang Tumbuh (Ganti Bunga) --- */
+        .duck-giant {
+            position: absolute; bottom: 35%; /* Di atas kolam */
+            width: 80px; height: 0; /* Mulai dari nol */
+            background-color: #fff176; /* Warna bebek */
+            border-radius: 50% 50% 40% 40%;
+            border: 4px solid #fbc02d;
+            z-index: 5;
+            transition: height 2.5s ease-out, transform 1s ease-in-out;
+            transform-origin: bottom center;
+            display: flex; flex-direction: column; align-items: center;
+            overflow: hidden; /* Sembunyikan paruh awalnya */
+            box-shadow: 0 -5px 20px rgba(255, 241, 118, 0.4);
+        }
+
+        /* State: Tumbuh */
+        .duck-giant.grown { height: 160px; }
+
+        /* State: Bebek Raksasa Terbuka/Mekar */
+        .duck-giant.open {
+            height: 180px; width: 140px;
+            border-radius: 50% 50% 20px 20px;
+            overflow: visible; /* Semua elemen muncul */
+            background-color: #fff9c4;
+        }
+
+        /* --- 5. Elemen Bebek Mekar (image_8.png modifikasi) --- */
+        .duck-eye { width: 12px; height: 16px; background: black; border-radius: 50%; position: absolute; top: 40px; opacity: 0; }
+        .duck-eye.left { left: 35px; }
+        .duck-eye.right { right: 35px; }
+
+        .duck-bill-giant {
+            width: 40px; height: 25px; background: #ff9800; border-radius: 12px;
+            position: absolute; top: 60px;
+            opacity: 0; transition: opacity 0.5s ease 0.5s;
+        }
+
+        /* Syal/Kerah Bunga (Unsur Bunga tetap ada tapi sekunder) */
+        .flower-collar {
+            position: absolute; top: 85px; left: -30px;
+            width: 200px; height: 60px;
+            display: flex; justify-content: space-around;
+            opacity: 0;
+            transition: all 1s ease-out 1s;
+        }
+        .petal {
+            width: 35px; height: 35px; background: #fff176; border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* State: Elemen Bebek Muncul */
+        .duck-giant.open .duck-eye,
+        .duck-giant.open .duck-bill-giant,
+        .duck-giant.open .flower-collar { opacity: 1; }
+
+        /* --- 6. Kue & Tanda untuk Nana (Estetik) --- */
+        .sign {
+            position: absolute; top: -50px; left: -60px;
+            font-family: 'Quicksand', sans-serif;
+            color: #d32f2f; /* Merah cerah */
+            border: 2px solid #d32f2f; background: white;
+            padding: 8px 18px; border-radius: 15px;
+            font-weight: bold; font-size: 14px;
+            white-space: nowrap; transform: rotate(-10deg) scale(0);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.5s;
+        }
+        
+        .duck-giant.open .sign { transform: rotate(-10deg) scale(1); }
+
+        .cake-plate {
+            position: absolute; top: 20px; right: -70px;
+            width: 80px; height: 80px;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; transition: all 1s ease-out 1s;
+        }
+        .duck-giant.open .cake-plate { opacity: 1; right: -60px; }
+
+        .cake { width: 50px; height: 40px; background: #f8bbd0; border-radius: 8px; position: relative; animation: cakePulse 1.5s infinite; }
+        .cake::before { content: '🕯️'; position: absolute; top: -20px; left: 15px; font-size: 20px; }
+
+        /* --- 7. CSS Animations --- */
+        @keyframes cakePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="stage">
+        <div class="feed-hand" id="feedHand">
+            <div class="feed-food">
+                <div class="pellet"></div>
+                <div class="pellet"></div>
+                <div class="pellet"></div>
+            </div>
+        </div>
+
+        <div class="duck-giant" id="duckGiant">
+            <div class="duck-eye left"></div>
+            <div class="duck-eye right"></div>
+            <div class="duck-bill-giant"></div>
+            
+            <div class="flower-collar">
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+                <div class="petal"></div>
+            </div>
+
+            <span class="sign">✨ Halo Nana! ✨</span>
+            
+            <div class="cake-plate">
+                <div class="cake"></div>
+            </div>
+        </div>
+
+        <div class="pond-container">
+            <div class="pond">
+                <div class="rubber-duck one"></div>
+                <div class="rubber-duck two"></div>
+                <div class="wave"></div>
+                <div class="wave" style="animation-delay: -3s; background: rgba(255,255,255,0.15);"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const feedHand = document.getElementById('feedHand');
+        const duckGiant = document.getElementById('duckGiant');
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        async function runParade() {
+            // Detik 1: Tangan kasih makan muncul
+            await wait(1000);
+            feedHand.classList.add('active');
+
+            // Detik 3: Makanan selesai, tangan hilang
+            await wait(2000);
+            feedHand.classList.remove('active');
+
+            // Detik 4: Bebek Raksasa mulai tumbuh
+            await wait(1000);
+            duckGiant.classList.add('grown');
+
+            // Detik 7: Bebek Raksasa MEKAR dan menyapa Nana!
+            await wait(3000);
+            duckGiant.classList.add('open');
+        }
+
+        // Jalankan saat halaman siap
+        window.addEventListener('load', runParade);
+    </script>
+</body>
+</html>
